@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package func2vec;
+
+message Edgelist {
+  message Edge {
+    string source = 1;
+    string target = 2;
+    string label = 3;
+    repeated int32 label_id = 5;
+    string location = 4;
+  }
+  message Label {
+    string label = 1;
+  }
+  repeated Edge edge = 1;
+  map<int32, Label> id_to_label = 2;
+}
+

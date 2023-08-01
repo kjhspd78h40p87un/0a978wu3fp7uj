@@ -1,0 +1,75 @@
+// For transmitting Interprocedural Control Flow Graph (ICFG) to the walker.
+
+syntax = "proto3";
+
+package error_specifications;
+
+import "proto/bitcode.proto";
+import "proto/domain_knowledge.proto";
+import "proto/operations.proto";
+
+service GetGraphService {
+  // Create the interprocedural control flow graph (ICFG) for a bitcode file.
+  // Returns a handle to the ICFG.
+  rpc GetGraph(GetGraphRequest) returns (Operation);
+}
+
+message GetGraphRequest {
+  // The bitcode ID to generate a graph for.
+  Handle bitcode_id = 1;
+
+  // The URI where the graph file will be saved.
+  Uri output_graph_uri = 2;
+
+  // Removes edges from caller to callee if the functions are from separate
+  // folders/components of the program.
+  bool remove_cross_folder = 3;
+
+  // The error codes that exist in the bitcode file.
+  repeated ErrorCode error_codes = 4;
+}
+
+message GetGraphResponse {
+  // The hash of the output graph file.
+  Handle graph_id = 1;
+
+  // The flow graph edge list.
+  Edgelist edgelist = 2;
+}
+
+// List of edges that are represented in the flow graph.
+message Edgelist {
+  repeated Edge edges = 1;
+
+  // Converts the edge IDs to their label.
+  map<int32, Label> id_to_label = 2;
+}
+
+message Edge {
+  // Name of the source node.
+  string source = 1;
+
+  // Name of the target node.
+  string target = 2;
+
+  // The meta-label indicates whether an edge goes to a function call, a return
+  // statement, or a may-return.
+  string meta_label = 3;
+
+  // Integer representation of the label for this edge.
+  // The id_to_label in the Edgelist gives the actual string representation for
+  // this edge label.
+  repeated int32 label_id = 4;
+
+  // Source location associated with the instruction that this
+  // edge represents.
+  string source_location = 5;
+}
+
+// Wrapper around a string label.
+// TODO(): This seems unnecessary. This should probably be removed
+// at some point and a string should just be utilized instead. Currently leaving
+// as is since there are several programs that utilize the Label protobuf.
+message Label {
+  string label = 1;
+}

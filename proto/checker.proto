@@ -1,0 +1,32 @@
+// This is the service for the tool EESI associated with the paper
+// Effective Error Specification Inference via Domain Knowledge Expansion
+
+syntax = "proto3";
+
+package error_specifications;
+
+import "proto/bitcode.proto";
+import "proto/operations.proto";
+import "proto/eesi.proto";
+
+service CheckerService {
+  // Get all violations of specifications. Returns Violations message.
+  // This is a long-running operation
+  rpc GetViolations(GetViolationsRequest) returns (Operation);
+}
+
+message GetViolationsRequest {
+  // Unique identifier of the bitcode file returned by Bitcode service.
+  Handle bitcode_id = 1;
+
+  // The specifications to check. The source name of the functions in the
+  // specifications will be used for comparison.
+  repeated Specification specifications = 2;
+
+  // The type of violations that we are interested in.
+  ViolationType violation_type = 3;
+}
+
+message GetViolationsResponse {
+  repeated Violation violations = 1;
+}
